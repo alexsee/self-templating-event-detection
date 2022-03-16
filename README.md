@@ -6,7 +6,7 @@ The following methods can be found in the repository:
 
 * Template generation
     * Segmentation: change point detection, binary segmentation
-    * Data cleaning:
+    * Data cleaning: trimming
     * Merging: averaging, barycenter averaging
 * Event Detection
     * MASS algorithm
