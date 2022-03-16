@@ -352,8 +352,6 @@ def calculateMetrics(resultsbyday, logsbyday, start = True, end = True, debug = 
                 assigned.append(entry)
                 notfound = False
                 break
-            if(notfound):
-              print('\033[91m' + "WIE IST DAS MÖGLICH" + '\033[0m')
       stats["FP"] = stats["FP"] + len( parsedresults[day]) - len(list(set([x[0] for x in assigned])))
       stats["deviation"] = [x[1] for x in assigned]
 

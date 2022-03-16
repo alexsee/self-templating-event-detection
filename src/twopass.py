@@ -1,4 +1,4 @@
-from changepoints import rupture
+from src.changepoints import ChangePointDetection
 from sklearn import cluster
 import math
 import statistics
@@ -18,7 +18,8 @@ plt.rcParams['xtick.direction'] = 'out'
 
 
 def firstPass(value_points, pen=1000, window=35, debug=False, method="Window"):
-    res = rupture(value_points=value_points, pen=pen, window=window, algrthm=method)
+    cp = ChangePointDetection()
+    res = cp.rupture(value_points=value_points, pen=pen, window=window, algrthm=method)
 
     if(debug):
         plt.suptitle('HaasST10 Wirkleistung', fontsize='30')
@@ -40,7 +41,7 @@ def firstPass(value_points, pen=1000, window=35, debug=False, method="Window"):
 def trimming(tmpl, trimrange=0.25, debug=False):
     trim_start = len(tmpl) - math.floor(len(tmpl) * trimrange)
 
-    lowest_diff = (0,len(tmpl)-1)
+    lowest_diff = (0, len(tmpl) - 1)
 
     for i in range(1,math.floor(len(tmpl) * trimrange)):
         avg_f = sum(tmpl[trim_start:trim_start + i])/len(tmpl[trim_start:trim_start + i])
@@ -48,8 +49,9 @@ def trimming(tmpl, trimrange=0.25, debug=False):
 
         if(avg_b - avg_f < lowest_diff[0]):
             lowest_diff = (avg_b - avg_f, trim_start+i)
+
     if(debug):
-        plt.suptitle('HaasST10 Wirkleistung diff=' + str(lowest_diff[0]), fontsize='30')
+        plt.suptitle('diff=' + str(lowest_diff[0]), fontsize='30')
         plt.xlabel('Time', fontsize ='20')
         plt.ylabel('Acceleration', fontsize='20')
         plt.plot(tmpl)
@@ -61,35 +63,30 @@ def trimming(tmpl, trimrange=0.25, debug=False):
 
 def clusterSegments(segments):
     seg_avg = list(map(lambda x: sum(x)/len(x), segments))
-    print(str(len(seg_avg)) +  " zu " + str(len(segments)))
+    
+    print("Average value:", str(len(seg_avg)), "; Number of segments:", str(len(segments)))
+    
+    # perform k-means clustering
     kmeans = cluster.KMeans(n_clusters=2, random_state=0).fit(np.array(seg_avg).reshape(-1,1))
     tmpl_pool = []
 
-    print(len(kmeans.labels_))
+    print("Number of labels: ", len(kmeans.labels_))
 
     lookforlabel = np.argmax(kmeans.cluster_centers_)
     for i in range(len(kmeans.labels_)):
         if(kmeans.labels_[i] == lookforlabel):
             tmpl_pool.append(segments[i])
-    
-    # Cluster by array length
-    # lenkmeans = cluster.KMeans(n_clusters=2, random_state=0).fit(np.array(list(map(lambda x: len(x), tmpl_pool))).reshape(-1,1))
-    # lentmpl_pool = []
-    # lookforlabel = np.argmin(lenkmeans.cluster_centers_)
-    # for i in range(len(lenkmeans.labels_)):
-    #     if(lenkmeans.labels_[i] == lookforlabel):
-    #         lentmpl_pool.append(tmpl_pool[i])
 
-    # Filter too far away from average length
+    # filter too far away from average length
     avglen = sum(list(map(lambda x: len(x), tmpl_pool)))/len(tmpl_pool)
     lentmpl_pool = []
     for tmpl in tmpl_pool:
         if(abs(len(tmpl) - avglen) < avglen * 0.3):
             lentmpl_pool.append(tmpl)
-    print("Kept " + str(len(lentmpl_pool)) + " out of " + str(len(tmpl_pool)))
+    
+    print("Kept " + str(len(lentmpl_pool)) + " segments out of " + str(len(tmpl_pool)) + " total")
 
     tmpl_pool = lentmpl_pool
-    
     return tmpl_pool
 
 
