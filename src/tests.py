@@ -74,7 +74,6 @@ def pattern(influx = False, _margin = 60, pen = 10, window = 35, interval = "5s"
   outfile = open(os.path.join(os.path.dirname(__file__), "../out/" + prefix + "metrics.json"), "w")
   json.dump(metrics, outfile)
   outfile.close()
-  print("All Done")
 
   return metrics
 
@@ -135,7 +134,6 @@ def main(influx = False, _margin = 60, n_bkps = False, pen = 10, window = 100, w
   outfile = open(os.path.join(os.path.dirname(__file__), "../out/" + prefix + "metrics.json"), "w")
   json.dump(metrics, outfile)
   outfile.close()
-  print("All Done")
 
   return metrics
 
@@ -200,12 +198,10 @@ def checkPointsForMachine(name, eventlog, ids, influx, wirkl_only, n_bkps, pen, 
     if influx:
       changepoints.insertToDB(result, points, name)
     
-  print("Done with " + name)
   return resultsbyday, logsbyday
 
 def checkpointsMatrixOrDTW(name, eventlog, ids, influx, pen, window, algo, interval, template, trimming, firstpassmethod="Window", mode="dynamic", t=1000, debug = False):
   #name = "HaasMM2"
-  print("Starting for " + name)
   wirkl_only = True
   relevantlog = list(filter(lambda x: x["Maschinenname"] == name and not("1970" in x["Start Betrieb"]) , eventlog)) #Filter some falsy dates/values with 1970
   relevantlog = cleanup(relevantlog)
@@ -222,7 +218,6 @@ def checkpointsMatrixOrDTW(name, eventlog, ids, influx, pen, window, algo, inter
     return resultsbyday, logsbyday
 
   for day in days:
-    print("Day: " + day)
     daydata = list(filter(lambda x: dateutil.parser.parse(x["Start Betrieb"]).strftime("%Y %m %d") == day, relevantlog))
 
     sortedTimestamps = sorted(map(lambda x: dateutil.parser.parse(x["Start Betrieb"]), daydata))
@@ -289,8 +284,6 @@ def checkpointsMatrixOrDTW(name, eventlog, ids, influx, pen, window, algo, inter
     if influx:
       changepoints.insertToDB(result, points, name)
     
-  print("Done with " + name)
-
   return resultsbyday, logsbyday
 
 def calculateMetrics(resultsbyday, logsbyday, start = True, end = True, debug = False, customMargin = 60):

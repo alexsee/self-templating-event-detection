@@ -83,8 +83,6 @@ def clusterSegments(segments):
     for tmpl in tmpl_pool:
         if(abs(len(tmpl) - avglen) < avglen * 0.3):
             lentmpl_pool.append(tmpl)
-    
-    print("Kept " + str(len(lentmpl_pool)) + " segments out of " + str(len(tmpl_pool)) + " total")
 
     tmpl_pool = lentmpl_pool
     return tmpl_pool
@@ -278,9 +276,3 @@ def main(value_points, pen, window, algo, template, _trimming, cpmethod, mode, t
         return False
 
     return changepoints
-
-if __name__ == "__main__":
-
-    print("Hallo")
-    
-    
